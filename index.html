@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PharmSim Evaluation Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">PharmSim research evaluation</p>
+        <h1>Cross-Case Dashboard</h1>
+      </div>
+      <div class="status-pill" id="dataStatus">Loading data</div>
+    </header>
+
+    <nav class="tabs" aria-label="Dashboard sections">
+      <button class="tab-button active" type="button" data-tab="overview">Overview</button>
+      <button class="tab-button" type="button" data-tab="participation">Participation</button>
+      <button class="tab-button" type="button" data-tab="engagement">Engagement</button>
+      <button class="tab-button" type="button" data-tab="performance">Performance</button>
+      <button class="tab-button" type="button" data-tab="trajectory">Trajectory</button>
+      <button class="tab-button" type="button" data-tab="students">Students</button>
+    </nav>
+
+    <main>
+      <!-- ============================ OVERVIEW ============================ -->
+      <section class="tab-panel active" id="overview">
+        <div class="section-heading">
+          <div>
+            <h2>Class Snapshot</h2>
+            <p>High-level view of how far students got across the three pharmacy simulations.</p>
+          </div>
+        </div>
+        <div class="metric-grid" id="overviewMetrics"></div>
+        <div id="completionScoreNote"></div>
+      </section>
+
+      <!-- ============================ PARTICIPATION ============================ -->
+      <section class="tab-panel" id="participation">
+        <div class="section-heading">
+          <div>
+            <h2>Participation And Data Coverage</h2>
+            <p>Shows where students attempted a case, completed the simulation, submitted an evaluation, and had performance data available for score summaries.</p>
+          </div>
+        </div>
+        <div class="definition-note">
+          <strong>Definitions:</strong>
+          Attempted means the cleaned data include a selected attempt for that case. Completed simulation means the selected attempt reached the End Chat marker. Evaluation submitted means the platform has a completed evaluation record. Performance data available means that case can be included in score summaries.
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <h3>Participation by Case</h3>
+            <p>Evaluation submission can be higher than completed simulation because the platform can record an evaluation even when the End Chat marker was not reached.</p>
+          </div>
+          <div class="table-wrap">
+            <table id="caseFunnelTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ ENGAGEMENT ============================ -->
+      <section class="tab-panel" id="engagement">
+        <div class="section-heading">
+          <div>
+            <h2>Engagement</h2>
+            <p>Conversation length and timing for the selected attempt in each case.</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <h3>Engagement Summary</h3>
+            <p>All attempted selected cases are included here. Median and IQR are shown first because engagement is uneven; mean ± SD is shown underneath for comparison. Word measures use student words only.</p>
+          </div>
+          <div class="table-wrap">
+            <table id="engagementSummaryTable"></table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <h3>Engagement by Completion Status</h3>
+            <p>Same engagement measures, split by whether the selected attempt reached the End Chat marker.</p>
+          </div>
+          <div class="table-wrap">
+            <table id="engagementCompletionTable"></table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <h3>Attempt Start Pattern</h3>
+            <p>Daily starts for selected case attempts. Percentages use all selected case starts as the denominator.</p>
+          </div>
+          <div class="table-wrap">
+            <table id="attemptTimingTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ PERFORMANCE ============================ -->
+      <section class="tab-panel" id="performance">
+        <div class="section-heading">
+          <div>
+            <h2>Performance</h2>
+            <p>Performance summaries use only cases where performance data are available. Participation and completion coverage are shown in the Participation tab.</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <h3>Total Score Summary</h3>
+            <p>Total scores are percentages because the three cases have different rubric maxima.</p>
+          </div>
+          <div class="table-wrap">
+            <table id="scoreSummaryTable"></table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading">
+            <h3>Rubric Section Overview</h3>
+            <p>Color-coded mean percentage among cases included in score summaries.</p>
+          </div>
+          <div id="sectionHeatmap"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading">
+            <h3>Detailed Rubric Areas</h3>
+            <p>Mean percentage by detailed rubric area. Blank cells mean that area was not part of that case rubric.</p>
+          </div>
+          <div id="detailHeatmap"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading">
+            <h3>Lower Mean Areas to Review</h3>
+            <p>The three lower mean detailed areas within each case, shown as a quick scanning aid.</p>
+          </div>
+          <div class="table-wrap">
+            <table id="subrubricTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ TRAJECTORY ============================ -->
+      <section class="tab-panel" id="trajectory">
+        <div class="section-heading">
+          <div>
+            <h2>Trajectory</h2>
+            <p>Student pathways are ordered by actual case-attempt timestamp. Accounts with no case attempt recorded are omitted from the sequence chart.</p>
+          </div>
+        </div>
+        <div class="metric-grid" id="trajectoryMetrics"></div>
+
+        <div class="chart-grid">
+          <div class="panel">
+            <div class="panel-heading">
+              <h3>Actual Case Sequence</h3>
+              <p>Chronological order chosen by students.</p>
+            </div>
+            <div id="sequenceBars"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-heading">
+              <h3>Score Change Pattern</h3>
+              <p>Descriptive score movement among students with at least one case attempt. Uses a 5 percentage-point band for "stable"; this does not imply learning or case equivalence.</p>
+            </div>
+            <div id="directionBars"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading">
+            <h3>Score Movement by Actual Attempt Order</h3>
+            <p>Score change in percentage points from each student's previous case with performance data available.</p>
+          </div>
+          <div class="table-wrap">
+            <table id="deltaTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ STUDENTS ============================ -->
+      <section class="tab-panel" id="students">
+        <div class="section-heading">
+          <div>
+            <h2>Student Trajectory Explorer</h2>
+            <p>De-identified student-level view. Click any sortable column header to sort.</p>
+          </div>
+          <div class="filter-row">
+            <label class="control">
+              <span>Sequence</span>
+              <select id="sequenceFilter"></select>
+            </label>
+            <label class="control">
+              <span>Score change</span>
+              <select id="directionFilter"></select>
+            </label>
+            <label class="control">
+              <span>Search ID</span>
+              <input id="studentSearch" type="search" placeholder="P0001" />
+            </label>
+            <button id="studentCsvExport" type="button" class="csv-button">Export CSV</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <h3 id="studentTableTitle">Students</h3>
+            <p>Rows are de-identified system accounts. Case counts range from 0 to 3 because there are three simulations; total attempts counts raw platform attempts, including retries.</p>
+          </div>
+          <div class="table-wrap">
+            <table id="studentTable"></table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
