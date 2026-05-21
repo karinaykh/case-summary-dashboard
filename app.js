@@ -113,11 +113,10 @@ async function init() {
   setupTabs();
   ensureTooltip();
   try {
-    const source = await loadDashboardData();
+    await loadDashboardData();
     appState.caseSummary = buildCaseSummary(appState.performance);
 
     renderAll();
-    setStatus(source === "csv" ? "Ready: live CSV" : "Ready: bundled data", "ready");
   } catch (error) {
     console.error(error);
     setStatus("Data error — see overview tab", "error");
@@ -274,6 +273,7 @@ function setupTabs() {
 
 function setStatus(text, className) {
   const status = document.getElementById("dataStatus");
+  if (!status) return;
   status.textContent = text;
   status.className = `status-pill ${className || ""}`.trim();
 }
@@ -389,7 +389,6 @@ function renderOverview() {
   const attemptedAny = countWhere(appState.trajectory, (row) => (toNumber(row.cases_attempted) || 0) > 0);
   const allThreeAttempted = countWhere(appState.trajectory, (row) => row.cases_attempted === "3");
   const allThreeCompleted = countWhere(appState.trajectory, (row) => row.cases_completed_interaction === "3");
-  const allThreePerformanceData = countWhere(appState.trajectory, (row) => row.cases_performance_eligible === "3");
   const anyMultiAttempt = unique(
     appState.performance.filter((row) => isTrue(row.has_multiple_attempts)).map((row) => row.anonymous_id)
   ).length;
@@ -399,15 +398,6 @@ function renderOverview() {
     metricCard("Completed all 3 simulations", allThreeCompleted, "reached final stage in all 3"),
     metricCard("Multiple attempts (any case)", anyMultiAttempt, "unique students"),
   ].join("");
-  const scoreGap = Math.max(0, allThreeCompleted - allThreePerformanceData);
-  document.getElementById("completionScoreNote").innerHTML = `
-    <div class="definition-note">
-      <strong>Completion vs performance data:</strong>
-      ${allThreeCompleted} students completed all 3 simulations.
-      Performance data were available for all 3 cases for ${allThreePerformanceData} students.
-      ${scoreGap ? `The ${scoreGap}-student gap reflects missing evaluation/rubric data in at least one case, not lower performance.` : "There is no gap between completion and available performance data."}
-    </div>
-  `;
 }
 
 function renderParticipation() {
